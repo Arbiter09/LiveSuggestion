@@ -9,7 +9,7 @@ import useSessionStore from '../store/useSessionStore';
  */
 export function useAudioRecorder() {
   const controllerRef = useRef(null);
-  const { apiKey, settings, setIsRecording, addTranscriptChunk } = useSessionStore();
+  const { apiKey, settings, setIsRecording, addTranscriptChunk, setTranscriptionError } = useSessionStore();
 
   const handleChunk = useCallback(
     async (blob) => {
@@ -19,9 +19,10 @@ export function useAudioRecorder() {
         if (text?.trim()) addTranscriptChunk(text.trim());
       } catch (err) {
         console.error('[Transcription]', err);
+        setTranscriptionError(err.message);
       }
     },
-    [apiKey, settings.transcriptionLanguage, addTranscriptChunk],
+    [apiKey, settings.transcriptionLanguage, addTranscriptChunk, setTranscriptionError],
   );
 
   const start = useCallback(async () => {

@@ -49,12 +49,14 @@ const useSessionStore = create((set, get) => ({
   // Each chunk: { id, text, timestamp }
   transcriptChunks: [],
   isRecording: false,
+  transcriptionError: null,
 
   addTranscriptChunk: (text) => {
     const chunk = { id: crypto.randomUUID(), text, timestamp: new Date() };
-    set((s) => ({ transcriptChunks: [...s.transcriptChunks, chunk] }));
+    set((s) => ({ transcriptChunks: [...s.transcriptChunks, chunk], transcriptionError: null }));
   },
 
+  setTranscriptionError: (msg) => set({ transcriptionError: msg }),
   setIsRecording: (val) => set({ isRecording: val }),
 
   // ── Suggestions ────────────────────────────────────────────────────────────

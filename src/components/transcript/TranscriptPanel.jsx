@@ -4,10 +4,9 @@ import MicButton from './MicButton';
 import TranscriptEntry from './TranscriptEntry';
 
 export default function TranscriptPanel() {
-  const { transcriptChunks, isRecording } = useSessionStore();
+  const { transcriptChunks, isRecording, transcriptionError } = useSessionStore();
   const bottomRef = useRef(null);
 
-  // Auto-scroll to latest entry
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [transcriptChunks.length]);
@@ -17,6 +16,11 @@ export default function TranscriptPanel() {
       <PanelHeader isRecording={isRecording} />
 
       <div className="panel-scroll px-4 py-3 space-y-4">
+        {transcriptionError && (
+          <div className="rounded-md bg-red-500/10 border border-red-500/20 px-3 py-2 text-xs text-red-400">
+            ⚠️ Transcription failed: {transcriptionError}
+          </div>
+        )}
         {transcriptChunks.length === 0 ? (
           <EmptyState isRecording={isRecording} />
         ) : (
