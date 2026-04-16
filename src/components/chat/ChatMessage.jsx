@@ -1,5 +1,8 @@
+import ReactMarkdown from 'react-markdown';
+
 /**
  * A single chat message bubble — user or assistant.
+ * Assistant messages render markdown (bold, bullets, etc).
  */
 export default function ChatMessage({ message }) {
   const isUser = message.role === 'user';
@@ -17,7 +20,28 @@ export default function ChatMessage({ message }) {
             : 'bg-surface-2 text-gray-200 rounded-bl-sm'
         }`}
       >
-        {message.content || <span className="opacity-40 animate-pulse">▍</span>}
+        {!message.content ? (
+          <span className="opacity-40 animate-pulse">▍</span>
+        ) : isUser ? (
+          message.content
+        ) : (
+          <ReactMarkdown
+            components={{
+              p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+              strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
+              ul: ({ children }) => <ul className="list-disc list-inside space-y-1 mb-2">{children}</ul>,
+              ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 mb-2">{children}</ol>,
+              li: ({ children }) => <li className="text-gray-300">{children}</li>,
+              code: ({ children }) => (
+                <code className="bg-surface-3 text-gray-200 px-1 py-0.5 rounded text-xs font-mono">
+                  {children}
+                </code>
+              ),
+            }}
+          >
+            {message.content}
+          </ReactMarkdown>
+        )}
       </div>
     </div>
   );
