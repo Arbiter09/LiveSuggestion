@@ -61,6 +61,7 @@ const useSessionStore = create((set, get) => ({
   // Each batch: { id, timestamp, suggestions: [{ id, type, preview, detail }] }
   suggestionBatches: [],
   isLoadingSuggestions: false,
+  suggestionError: null,
 
   addSuggestionBatch: (suggestions) => {
     const batch = {
@@ -68,10 +69,11 @@ const useSessionStore = create((set, get) => ({
       timestamp: new Date(),
       suggestions: suggestions.map((s) => ({ ...s, id: crypto.randomUUID() })),
     };
-    set((s) => ({ suggestionBatches: [batch, ...s.suggestionBatches] }));
+    set((s) => ({ suggestionBatches: [batch, ...s.suggestionBatches], suggestionError: null }));
   },
 
   setIsLoadingSuggestions: (val) => set({ isLoadingSuggestions: val }),
+  setSuggestionError: (msg) => set({ suggestionError: msg }),
 
   // ── Chat ───────────────────────────────────────────────────────────────────
   // Each message: { id, role: 'user' | 'assistant', content, timestamp }

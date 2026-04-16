@@ -3,7 +3,7 @@ import { useAutoRefresh } from '../../hooks/useAutoRefresh';
 import SuggestionBatch from './SuggestionBatch';
 
 export default function SuggestionsPanel({ onSuggestionClick }) {
-  const { suggestionBatches, isLoadingSuggestions, transcriptChunks } = useSessionStore();
+  const { suggestionBatches, isLoadingSuggestions, suggestionError, transcriptChunks } = useSessionStore();
   const { refresh } = useAutoRefresh();
 
   return (
@@ -16,6 +16,11 @@ export default function SuggestionsPanel({ onSuggestionClick }) {
       />
 
       <div className="panel-scroll px-4 py-3 space-y-5">
+        {suggestionError && (
+          <div className="rounded-md bg-red-500/10 border border-red-500/20 px-3 py-2 text-xs text-red-400">
+            ⚠️ {suggestionError}
+          </div>
+        )}
         {suggestionBatches.length === 0 ? (
           <EmptyState isLoading={isLoadingSuggestions} />
         ) : (

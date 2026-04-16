@@ -15,6 +15,7 @@ export function useAutoRefresh() {
     isRecording,
     transcriptChunks,
     setIsLoadingSuggestions,
+    setSuggestionError,
     addSuggestionBatch,
   } = useSessionStore();
 
@@ -24,6 +25,7 @@ export function useAutoRefresh() {
     if (!recentTranscript.trim()) return;
 
     setIsLoadingSuggestions(true);
+    setSuggestionError(null);
     try {
       const suggestions = await fetchSuggestions(
         recentTranscript,
@@ -33,6 +35,7 @@ export function useAutoRefresh() {
       if (suggestions.length) addSuggestionBatch(suggestions);
     } catch (err) {
       console.error('[Suggestions]', err);
+      setSuggestionError(err.message);
     } finally {
       setIsLoadingSuggestions(false);
     }

@@ -8,7 +8,7 @@
 
 const GROQ_BASE = 'https://api.groq.com/openai/v1';
 const WHISPER_MODEL = 'whisper-large-v3';
-const LLM_MODEL = 'meta-llama/llama-4-maverick-17b-128e-instruct';
+const LLM_MODEL = 'openai/gpt-oss-120b';
 
 // ── Transcription ────────────────────────────────────────────────────────────
 
