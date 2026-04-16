@@ -21,12 +21,16 @@ export default function ChatPanel() {
 
     try {
       const transcript = useSessionStore.getState().getChatTranscript();
+
+      // Build history: exclude the empty assistant placeholder just added,
+      // and filter out any empty messages from prior incomplete responses.
       const history = useSessionStore
         .getState()
-        .chatMessages.slice(0, -1) // exclude the empty assistant placeholder
+        .chatMessages.slice(0, -1)
+        .filter((m) => m.content.trim())
         .map(({ role, content }) => ({ role, content }));
 
-      const systemWithTranscript = `${settings.chatPrompt}\n\n---\nFull session transcript so far:\n${transcript || '(no transcript yet)'}`;
+      const systemWithTranscript = `${settings.chatPrompt}\n\n---\nSession transcript:\n${transcript || '(no transcript yet)'}`;
 
       await streamChatReply(history, systemWithTranscript, apiKey, (token) => {
         appendToLastMessage(token);

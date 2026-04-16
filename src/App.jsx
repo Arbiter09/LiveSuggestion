@@ -25,13 +25,14 @@ export default function App() {
 
       try {
         const transcript = useSessionStore.getState().getChatTranscript();
-        const systemPrompt = `${settings.detailedAnswerPrompt}\n\n---\nFull session transcript:\n${transcript || '(no transcript yet)'}`;
 
-        // Provide the detail field as extra context in the user turn
+        // Inject the suggestion type so the prompt can apply the right response style.
+        const systemPrompt = `${settings.detailedAnswerPrompt}\n\nThe suggestion that was clicked is of type: ${suggestion.type}\n\n---\nFull session transcript:\n${transcript || '(no transcript yet)'}`;
+
         const messages = [
           {
             role: 'user',
-            content: `The user clicked this suggestion:\nType: ${suggestion.type}\nPreview: ${suggestion.preview}\nInternal detail hint: ${suggestion.detail}\n\nPlease provide a helpful, detailed response.`,
+            content: `Suggestion clicked:\nType: ${suggestion.type}\nPreview: "${suggestion.preview}"\nContext hint: ${suggestion.detail}\n\nProvide a detailed, immediately useful response following the style guide for ${suggestion.type}.`,
           },
         ];
 
