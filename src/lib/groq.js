@@ -45,11 +45,16 @@ export async function transcribeAudio(audioBlob, apiKey, language = 'en') {
  * @param {Array<{text: string}>} transcriptChunks
  * @param {string} systemPrompt
  * @param {string} apiKey
+ * @param {string[]} lastBatchPreviews - previews from the most recent batch to avoid repeating
  * @returns {Promise<Array<{type, preview, detail}>>}
  */
-export async function fetchSuggestions(transcriptChunks, systemPrompt, apiKey) {
+export async function fetchSuggestions(transcriptChunks, systemPrompt, apiKey, lastBatchPreviews = []) {
   const { broaderContext, recentContext } = splitTranscriptContext(transcriptChunks);
   const clientSignals = buildClientSignals(recentContext);
+
+  const alreadyShown = lastBatchPreviews.length
+    ? `\nALREADY_SHOWN (do NOT repeat or paraphrase these):\n${lastBatchPreviews.map((p, i) => `${i + 1}. ${p}`).join('\n')}`
+    : '';
 
   const res = await fetch(`${GROQ_BASE}/chat/completions`, {
     method: 'POST',
@@ -66,7 +71,7 @@ export async function fetchSuggestions(transcriptChunks, systemPrompt, apiKey) {
         { role: 'system', content: systemPrompt },
         {
           role: 'user',
-          content: `BROADER_CONTEXT:\n${broaderContext || '(none)'}\n\nRECENT_CONTEXT:\n${recentContext || '(none)'}\n\nCLIENT_SIGNALS:\n${JSON.stringify(clientSignals, null, 2)}\n\nGenerate exactly 3 suggestions.`,
+          content: `BROADER_CONTEXT:\n${broaderContext || '(none)'}\n\nRECENT_CONTEXT:\n${recentContext || '(none)'}\n\nCLIENT_SIGNALS:\n${JSON.stringify(clientSignals, null, 2)}${alreadyShown}\n\nGenerate exactly 3 suggestions.`,
         },
       ],
     }),

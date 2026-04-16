@@ -62,14 +62,21 @@ const useSessionStore = create((set, get) => ({
   suggestionBatches: [],
   isLoadingSuggestions: false,
   suggestionError: null,
+  // Snapshot of the recent transcript text at the time the last batch was generated.
+  // Used to skip refreshes when not enough new content has arrived.
+  lastSuggestedTranscript: '',
 
-  addSuggestionBatch: (suggestions) => {
+  addSuggestionBatch: (suggestions, transcriptSnapshot) => {
     const batch = {
       id: crypto.randomUUID(),
       timestamp: new Date(),
       suggestions: suggestions.map((s) => ({ ...s, id: crypto.randomUUID() })),
     };
-    set((s) => ({ suggestionBatches: [batch, ...s.suggestionBatches], suggestionError: null }));
+    set((s) => ({
+      suggestionBatches: [batch, ...s.suggestionBatches],
+      suggestionError: null,
+      lastSuggestedTranscript: transcriptSnapshot ?? s.lastSuggestedTranscript,
+    }));
   },
 
   setIsLoadingSuggestions: (val) => set({ isLoadingSuggestions: val }),
