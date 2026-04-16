@@ -9,6 +9,8 @@ import { fetchSuggestions } from '../lib/groq';
  */
 export function useAutoRefresh() {
   const timerRef = useRef(null);
+  const lastTriggeredChunkCountRef = useRef(0);
+  const debounceRef = useRef(null);
   const {
     apiKey,
     settings,
@@ -21,18 +23,15 @@ export function useAutoRefresh() {
 
   const refresh = async () => {
     if (!apiKey || !transcriptChunks.length) return;
-    const recentTranscript = useSessionStore.getState().getRecentTranscript();
-    if (!recentTranscript.trim()) return;
+    const latestChunk = transcriptChunks[transcriptChunks.length - 1]?.text ?? '';
+    if (!latestChunk.trim()) return;
 
     setIsLoadingSuggestions(true);
     setSuggestionError(null);
     try {
-      const suggestions = await fetchSuggestions(
-        recentTranscript,
-        settings.suggestionPrompt,
-        apiKey,
-      );
+      const suggestions = await fetchSuggestions(transcriptChunks, settings.suggestionPrompt, apiKey);
       if (suggestions.length) addSuggestionBatch(suggestions);
+      else setSuggestionError('No valid suggestions returned. Try reload or tweak the prompt.');
     } catch (err) {
       console.error('[Suggestions]', err);
       setSuggestionError(err.message);
@@ -51,6 +50,21 @@ export function useAutoRefresh() {
     return () => clearInterval(timerRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRecording, settings.refreshIntervalMs, apiKey]);
+
+  // Trigger suggestions shortly after each new transcript chunk arrives.
+  useEffect(() => {
+    if (!isRecording || !apiKey || transcriptChunks.length === 0) return;
+    if (lastTriggeredChunkCountRef.current === transcriptChunks.length) return;
+
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      refresh();
+      lastTriggeredChunkCountRef.current = transcriptChunks.length;
+    }, 500);
+
+    return () => clearTimeout(debounceRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transcriptChunks.length, isRecording, apiKey]);
 
   return { refresh };
 }

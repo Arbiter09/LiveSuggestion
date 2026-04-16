@@ -42,12 +42,15 @@ export async function transcribeAudio(audioBlob, apiKey, language = 'en') {
 // ── Suggestions ──────────────────────────────────────────────────────────────
 
 /**
- * @param {string} recentTranscript
+ * @param {Array<{text: string}>} transcriptChunks
  * @param {string} systemPrompt
  * @param {string} apiKey
  * @returns {Promise<Array<{type, preview, detail}>>}
  */
-export async function fetchSuggestions(recentTranscript, systemPrompt, apiKey) {
+export async function fetchSuggestions(transcriptChunks, systemPrompt, apiKey) {
+  const { broaderContext, recentContext } = splitTranscriptContext(transcriptChunks);
+  const clientSignals = buildClientSignals(recentContext);
+
   const res = await fetch(`${GROQ_BASE}/chat/completions`, {
     method: 'POST',
     headers: {
@@ -63,7 +66,7 @@ export async function fetchSuggestions(recentTranscript, systemPrompt, apiKey) {
         { role: 'system', content: systemPrompt },
         {
           role: 'user',
-          content: `Recent transcript:\n\n${recentTranscript}\n\nGenerate 3 suggestions.`,
+          content: `BROADER_CONTEXT:\n${broaderContext || '(none)'}\n\nRECENT_CONTEXT:\n${recentContext || '(none)'}\n\nCLIENT_SIGNALS:\n${JSON.stringify(clientSignals, null, 2)}\n\nGenerate exactly 3 suggestions.`,
         },
       ],
     }),
@@ -75,8 +78,42 @@ export async function fetchSuggestions(recentTranscript, systemPrompt, apiKey) {
   }
 
   const data = await res.json();
-  const parsed = JSON.parse(data.choices[0].message.content);
-  return parsed.suggestions ?? [];
+  const parsed = JSON.parse(data.choices[0].message.content || '{}');
+  const suggestions = Array.isArray(parsed.suggestions) ? parsed.suggestions : [];
+  return sanitizeSuggestions(suggestions);
+}
+
+function splitTranscriptContext(chunks) {
+  if (!chunks.length) return { broaderContext: '', recentContext: '' };
+  const recentChunk = chunks[chunks.length - 1]?.text ?? '';
+  const broaderContext = chunks
+    .slice(0, -1)
+    .map((c) => c.text)
+    .join('\n\n')
+    .slice(-5000);
+  return { broaderContext, recentContext: recentChunk };
+}
+
+function buildClientSignals(recentContext) {
+  const text = recentContext || '';
+  return {
+    question_detected: /\?/.test(text),
+    number_or_metric_detected: /\b\d+([.,]\d+)?\b|%|\$|ms|sec|million|billion/gi.test(text),
+    architecture_terms_detected:
+      /(latency|throughput|cache|shard|kafka|queue|database|websocket|api|worker)/gi.test(text),
+    recency_note: 'Prioritize RECENT_CONTEXT over BROADER_CONTEXT when conflicts exist.',
+  };
+}
+
+function sanitizeSuggestions(items) {
+  return items
+    .filter((s) => s && s.type && s.preview && s.detail)
+    .slice(0, 3)
+    .map((s) => ({
+      type: String(s.type).toUpperCase(),
+      preview: String(s.preview).trim(),
+      detail: String(s.detail).trim(),
+    }));
 }
 
 // ── Streaming Chat ────────────────────────────────────────────────────────────
