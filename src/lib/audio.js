@@ -1,17 +1,21 @@
 /**
- * Abstracts MediaRecorder lifecycle for 30-second chunked audio capture.
- * Returns a controller object so callers don't manage raw MediaRecorder state.
+ * Abstracts MediaRecorder into a stop-start cycle for chunked audio capture.
+ *
+ * WHY stop-start instead of timeslice:
+ * MediaRecorder with timeslice produces chunks after the first that are missing
+ * codec initialization headers. Most audio decoders (including Whisper) cannot
+ * process these headerless blobs. Stopping and restarting the recorder every
+ * CHUNK_INTERVAL_MS ensures every blob is a self-contained, fully decodable file.
  */
 
 const CHUNK_INTERVAL_MS = 30_000;
 
 /**
- * Starts recording from the user's microphone.
- * Calls onChunk with each audio Blob as it's produced (every ~30s).
- * Calls onError if the mic cannot be accessed.
+ * Starts a continuous stop-start recording cycle.
+ * Calls onChunk with a complete, independently decodable Blob every ~30s.
  *
  * @param {{ onChunk: (blob: Blob) => void, onError: (err: Error) => void }}
- * @returns {Promise<{ stop: () => void }>}
+ * @returns {Promise<{ stop: () => void } | null>}
  */
 export async function startRecording({ onChunk, onError }) {
   let stream;
@@ -22,21 +26,49 @@ export async function startRecording({ onChunk, onError }) {
     return null;
   }
 
-  const mimeType = getSupportedMimeType();
-  const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
+  let stopped = false;
+  let currentRecorder = null;
+  let cycleTimeout = null;
 
-  recorder.ondataavailable = (e) => {
-    if (e.data && e.data.size > 0) onChunk(e.data);
-  };
+  function startCycle() {
+    if (stopped) return;
 
-  recorder.onerror = (e) => onError(new Error(e.error?.message ?? 'MediaRecorder error'));
+    const mimeType = getSupportedMimeType();
+    const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
+    currentRecorder = recorder;
 
-  recorder.start(CHUNK_INTERVAL_MS);
+    recorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) onChunk(e.data);
+    };
+
+    recorder.onerror = (e) => {
+      onError(new Error(e.error?.message ?? 'MediaRecorder error'));
+    };
+
+    // When this cycle ends naturally (via the timeout), immediately start the next.
+    recorder.onstop = () => {
+      if (!stopped) startCycle();
+    };
+
+    recorder.start(); // no timeslice — collect the full interval as one blob
+
+    cycleTimeout = setTimeout(() => {
+      if (recorder.state === 'recording') recorder.stop();
+    }, CHUNK_INTERVAL_MS);
+  }
+
+  startCycle();
 
   return {
     stop: () => {
-      recorder.stop();
-      stream.getTracks().forEach((t) => t.stop());
+      stopped = true;
+      clearTimeout(cycleTimeout);
+      // Stop current recorder to flush its final chunk before killing the stream.
+      if (currentRecorder && currentRecorder.state === 'recording') {
+        currentRecorder.stop();
+      }
+      // Give ondataavailable a moment to fire before tearing down the stream.
+      setTimeout(() => stream.getTracks().forEach((t) => t.stop()), 300);
     },
   };
 }
