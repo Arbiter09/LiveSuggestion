@@ -64,8 +64,8 @@ export async function fetchSuggestions(transcriptChunks, systemPrompt, apiKey, l
     },
     body: JSON.stringify({
       model: LLM_MODEL,
-      temperature: 0.7,
-      max_tokens: 1024,
+      temperature: 0.75,
+      max_tokens: 1200,
       response_format: { type: 'json_object' },
       messages: [
         { role: 'system', content: systemPrompt },
@@ -84,8 +84,15 @@ export async function fetchSuggestions(transcriptChunks, systemPrompt, apiKey, l
 
   const data = await res.json();
   const parsed = JSON.parse(data.choices[0].message.content || '{}');
-  const suggestions = Array.isArray(parsed.suggestions) ? parsed.suggestions : [];
-  return sanitizeSuggestions(suggestions);
+  const suggestions = sanitizeSuggestions(Array.isArray(parsed.suggestions) ? parsed.suggestions : []);
+
+  // If the model returned fewer than 3 valid suggestions, retry once without
+  // the ALREADY_SHOWN constraint so we always surface a full batch.
+  if (suggestions.length < 3 && lastBatchPreviews.length > 0) {
+    return fetchSuggestions(transcriptChunks, systemPrompt, apiKey, []);
+  }
+
+  return suggestions;
 }
 
 function splitTranscriptContext(chunks) {
