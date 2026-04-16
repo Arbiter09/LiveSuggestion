@@ -24,7 +24,7 @@ export default function App() {
       setIsStreaming(true);
 
       try {
-        const transcript = useSessionStore.getState().getChatTranscript();
+        const transcript = useSessionStore.getState().getDetailedAnswerTranscript();
 
         // Inject the suggestion type so the prompt can apply the right response style.
         const systemPrompt = `${settings.detailedAnswerPrompt}\n\nThe suggestion that was clicked is of type: ${suggestion.type}\n\n---\nFull session transcript:\n${transcript || '(no transcript yet)'}`;

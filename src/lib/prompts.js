@@ -116,7 +116,10 @@ export const DEFAULT_SETTINGS = {
   detailedAnswerPrompt: DEFAULT_DETAILED_ANSWER_PROMPT,
   chatPrompt: DEFAULT_CHAT_PROMPT,
   suggestionContextChars: 3000,
-  chatContextChars: 8000,
+  // Detailed answer (card click): larger window so the model has full context
+  // for a thorough response, but capped below chat to keep latency low.
+  detailedAnswerContextChars: 6000,
+  chatContextChars: 10000,
   refreshIntervalMs: 30000,
   transcriptionLanguage: 'en',
 };

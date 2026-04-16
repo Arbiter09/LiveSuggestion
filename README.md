@@ -163,6 +163,7 @@ All prompts and context windows are editable at runtime via the Settings modal:
 | Detailed answer prompt | See `prompts.js` | System prompt when a card is clicked |
 | Chat system prompt | See `prompts.js` | System prompt for the freeform chat panel |
 | Suggestion context | 3,000 chars | Recent transcript chars passed for suggestion generation |
-| Chat context | 8,000 chars | Transcript chars included in chat queries |
+| Detailed answer context | 6,000 chars | Transcript chars included when a suggestion card is clicked |
+| Chat context | 10,000 chars | Transcript chars included in freeform chat queries |
 | Refresh interval | 30,000 ms | Auto-refresh cadence while recording |
 | Transcription language | `en` | BCP-47 language code passed to Whisper |

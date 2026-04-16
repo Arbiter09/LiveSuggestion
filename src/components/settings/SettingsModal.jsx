@@ -107,8 +107,15 @@ export default function SettingsModal({ onClose }) {
                 type="number"
               />
               <SettingsField
+                label="Detailed Answer Context (characters)"
+                description="Transcript chars included when a suggestion card is clicked. Default: 6000."
+                value={String(settings.detailedAnswerContextChars)}
+                onChange={(v) => updateSettings({ detailedAnswerContextChars: Number(v) })}
+                type="number"
+              />
+              <SettingsField
                 label="Chat Context (characters)"
-                description="How many recent transcript characters to include in chat queries."
+                description="Transcript chars included in freeform chat queries. Default: 10000."
                 value={String(settings.chatContextChars)}
                 onChange={(v) => updateSettings({ chatContextChars: Number(v) })}
                 type="number"

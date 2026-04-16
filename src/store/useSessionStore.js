@@ -127,6 +127,12 @@ const useSessionStore = create((set, get) => ({
     const full = transcriptChunks.map((c) => c.text).join('\n\n');
     return full.slice(-settings.chatContextChars);
   },
+
+  getDetailedAnswerTranscript: () => {
+    const { transcriptChunks, settings } = get();
+    const full = transcriptChunks.map((c) => c.text).join('\n\n');
+    return full.slice(-settings.detailedAnswerContextChars);
+  },
 }));
 
 export default useSessionStore;
