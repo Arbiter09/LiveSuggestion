@@ -5,7 +5,8 @@ import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
 
 export default function ChatPanel() {
-  const { chatMessages, isStreaming, apiKey, settings, addChatMessage, appendToLastMessage, setIsStreaming, getChatTranscript } = useSessionStore();
+  const { chatMessages, isStreaming, apiKey, settings, addChatMessage, appendToLastMessage, setIsStreaming } =
+    useSessionStore();
   const bottomRef = useRef(null);
 
   useEffect(() => {

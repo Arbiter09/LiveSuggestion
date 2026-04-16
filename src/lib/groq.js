@@ -48,7 +48,13 @@ export async function transcribeAudio(audioBlob, apiKey, language = 'en') {
  * @param {string[]} lastBatchPreviews - previews from the most recent batch to avoid repeating
  * @returns {Promise<Array<{type, preview, detail}>>}
  */
-export async function fetchSuggestions(transcriptChunks, systemPrompt, apiKey, lastBatchPreviews = []) {
+export async function fetchSuggestions(
+  transcriptChunks,
+  systemPrompt,
+  apiKey,
+  lastBatchPreviews = [],
+  attempt = 0,
+) {
   const { broaderContext, recentContext } = splitTranscriptContext(transcriptChunks);
   const clientSignals = buildClientSignals(recentContext);
 
@@ -86,13 +92,15 @@ export async function fetchSuggestions(transcriptChunks, systemPrompt, apiKey, l
   const parsed = JSON.parse(data.choices[0].message.content || '{}');
   const suggestions = sanitizeSuggestions(Array.isArray(parsed.suggestions) ? parsed.suggestions : []);
 
-  // If the model returned fewer than 3 valid suggestions, retry once without
-  // the ALREADY_SHOWN constraint so we always surface a full batch.
-  if (suggestions.length < 3 && lastBatchPreviews.length > 0) {
-    return fetchSuggestions(transcriptChunks, systemPrompt, apiKey, []);
+  // Guarantee a full 3-card batch:
+  // - First retry drops ALREADY_SHOWN (if any) in case constraints are too strict.
+  // - Second retry boosts determinism by asking again with no dedupe context.
+  if (suggestions.length < 3 && attempt < 2) {
+    const nextPreviews = attempt === 0 ? [] : lastBatchPreviews;
+    return fetchSuggestions(transcriptChunks, systemPrompt, apiKey, nextPreviews, attempt + 1);
   }
 
-  return suggestions;
+  return suggestions.slice(0, 3);
 }
 
 function splitTranscriptContext(chunks) {
