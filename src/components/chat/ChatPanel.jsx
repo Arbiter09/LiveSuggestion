@@ -63,21 +63,31 @@ export default function ChatPanel() {
 
 function PanelHeader() {
   return (
-    <div className="px-4 py-3 border-b border-surface-3 shrink-0">
-      <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-        3. Chat (Detailed Answers)
-      </span>
-      <span className="ml-2 text-xs text-gray-600">Session-only</span>
+    <div className="flex items-center gap-2 px-4 py-3 border-b border-surface-3 shrink-0">
+      <ChatIcon />
+      <span className="text-sm font-semibold text-gray-200">Chat</span>
+      <span className="text-xs text-gray-600 bg-surface-2 px-1.5 py-0.5 rounded-full">Session-only</span>
     </div>
   );
 }
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center h-40 text-center gap-2">
-      <p className="text-sm text-gray-500">
-        Click a suggestion or type a question to start chatting.
+    <div className="flex flex-col items-center justify-center h-48 text-center gap-3 px-4">
+      <div className="w-10 h-10 rounded-full bg-surface-2 flex items-center justify-center text-gray-600">
+        <ChatIcon size={20} />
+      </div>
+      <p className="text-sm text-gray-500 leading-relaxed">
+        Click a suggestion or type a question to get a detailed answer.
       </p>
     </div>
+  );
+}
+
+function ChatIcon({ size = 14 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 shrink-0">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
   );
 }

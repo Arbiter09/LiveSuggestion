@@ -8,13 +8,15 @@ export default function SuggestionBatch({ batch, onSuggestionClick, isLatest }) 
   });
 
   return (
-    <div className={isLatest ? '' : 'opacity-50'}>
-      <div className="flex items-center gap-2 mb-2">
+    <div>
+      <div className="flex items-center gap-2 mb-3">
         <div className="h-px flex-1 bg-surface-3" />
-        <span className="text-[10px] text-gray-600 tabular-nums shrink-0">{time}</span>
+        <span className={`text-[10px] tabular-nums shrink-0 px-1.5 py-0.5 rounded ${isLatest ? 'text-accent bg-accent/10' : 'text-gray-600'}`}>
+          {isLatest ? 'Latest · ' : ''}{time}
+        </span>
         <div className="h-px flex-1 bg-surface-3" />
       </div>
-      <div className="space-y-2">
+      <div className={`space-y-2 ${isLatest ? '' : 'opacity-40'}`}>
         {batch.suggestions.map((s) => (
           <SuggestionCard key={s.id} suggestion={s} onClick={onSuggestionClick} />
         ))}

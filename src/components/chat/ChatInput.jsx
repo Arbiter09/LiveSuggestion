@@ -1,5 +1,14 @@
 import { useState } from 'react';
 
+function SendIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="19" x2="12" y2="5" />
+      <polyline points="5 12 12 5 19 12" />
+    </svg>
+  );
+}
+
 export default function ChatInput({ onSend, disabled }) {
   const [value, setValue] = useState('');
 
@@ -18,7 +27,7 @@ export default function ChatInput({ onSend, disabled }) {
   };
 
   return (
-    <div className="flex items-end gap-2 p-3 border-t border-surface-3 shrink-0">
+    <div className="flex items-end gap-2 px-3 py-3 border-t border-surface-3 shrink-0">
       <textarea
         rows={1}
         value={value}
@@ -26,15 +35,17 @@ export default function ChatInput({ onSend, disabled }) {
         onKeyDown={handleKeyDown}
         placeholder="Ask anything…"
         disabled={disabled}
-        className="flex-1 bg-surface-2 border border-surface-3 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 resize-none focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-40"
+        className="flex-1 bg-surface-2 border border-surface-3 rounded-xl px-3.5 py-2.5 text-sm text-gray-200 placeholder-gray-600 resize-none focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-40 leading-relaxed"
         style={{ maxHeight: '120px', overflowY: 'auto' }}
       />
       <button
         onClick={submit}
         disabled={disabled || !value.trim()}
-        className="px-4 py-2 text-xs font-semibold bg-accent hover:bg-accent-hover rounded-lg text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+        title="Send message"
+        aria-label="Send message"
+        className="flex items-center justify-center w-9 h-9 bg-accent hover:bg-accent-hover rounded-xl text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
       >
-        Send
+        <SendIcon />
       </button>
     </div>
   );

@@ -17,8 +17,9 @@ export default function SuggestionsPanel({ onSuggestionClick }) {
 
       <div className="panel-scroll px-4 py-3 space-y-5">
         {suggestionError && (
-          <div className="rounded-md bg-red-500/10 border border-red-500/20 px-3 py-2 text-xs text-red-400">
-            ⚠️ {suggestionError}
+          <div className="rounded-md bg-red-500/10 border border-red-500/20 px-3 py-2 text-xs text-red-400 flex items-center gap-2">
+            <span className="shrink-0">⚠️</span>
+            {suggestionError}
           </div>
         )}
         {suggestionBatches.length === 0 ? (
@@ -42,11 +43,10 @@ function PanelHeader({ batchCount, onRefresh, isLoading, hasTranscript }) {
   return (
     <div className="flex items-center justify-between px-4 py-3 border-b border-surface-3 shrink-0">
       <div className="flex items-center gap-2">
-        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-          2. Live Suggestions
-        </span>
+        <SparkleIcon />
+        <span className="text-sm font-semibold text-gray-200">Suggestions</span>
         {batchCount > 0 && (
-          <span className="text-xs text-gray-500">{batchCount} batch{batchCount !== 1 ? 'es' : ''}</span>
+          <span className="text-xs text-gray-600 bg-surface-2 px-1.5 py-0.5 rounded-full tabular-nums">{batchCount}</span>
         )}
       </div>
       <button
@@ -63,11 +63,22 @@ function PanelHeader({ batchCount, onRefresh, isLoading, hasTranscript }) {
 
 function EmptyState({ isLoading }) {
   return (
-    <div className="flex flex-col items-center justify-center h-40 text-center gap-2">
-      <p className="text-sm text-gray-500">
-        {isLoading ? 'Generating suggestions…' : 'Suggestions appear here after recording starts.'}
+    <div className="flex flex-col items-center justify-center h-48 text-center gap-3 px-4">
+      <div className="w-10 h-10 rounded-full bg-surface-2 flex items-center justify-center text-gray-600">
+        <SparkleIcon size={20} />
+      </div>
+      <p className="text-sm text-gray-500 leading-relaxed">
+        {isLoading ? 'Generating suggestions…' : 'Suggestions will appear here as you record.'}
       </p>
     </div>
+  );
+}
+
+function SparkleIcon({ size = 14 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 shrink-0">
+      <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
+    </svg>
   );
 }
 

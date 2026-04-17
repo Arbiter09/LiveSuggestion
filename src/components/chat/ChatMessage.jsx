@@ -1,9 +1,15 @@
 import ReactMarkdown from 'react-markdown';
 
-/**
- * A single chat message bubble — user or assistant.
- * Assistant messages render markdown (bold, bullets, etc).
- */
+function TypingIndicator() {
+  return (
+    <span className="flex items-center gap-1 py-0.5">
+      <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce [animation-delay:0ms]" />
+      <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce [animation-delay:150ms]" />
+      <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce [animation-delay:300ms]" />
+    </span>
+  );
+}
+
 export default function ChatMessage({ message }) {
   const isUser = message.role === 'user';
 
@@ -21,7 +27,7 @@ export default function ChatMessage({ message }) {
         }`}
       >
         {!message.content ? (
-          <span className="opacity-40 animate-pulse">▍</span>
+          <TypingIndicator />
         ) : isUser ? (
           message.content
         ) : (
