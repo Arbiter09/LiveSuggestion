@@ -62,14 +62,36 @@ function PanelHeader({ batchCount, onRefresh, isLoading, hasTranscript }) {
 }
 
 function EmptyState({ isLoading }) {
+  if (isLoading) {
+    return (
+      <div className="space-y-2">
+        <SkeletonCard wide />
+        <SkeletonCard />
+        <SkeletonCard wide />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center justify-center h-48 text-center gap-3 px-4">
       <div className="w-10 h-10 rounded-full bg-surface-2 flex items-center justify-center text-gray-600">
         <SparkleIcon size={20} />
       </div>
       <p className="text-sm text-gray-500 leading-relaxed">
-        {isLoading ? 'Generating suggestions…' : 'Suggestions will appear here as you record.'}
+        Suggestions will appear here as you record.
       </p>
+    </div>
+  );
+}
+
+function SkeletonCard({ wide }) {
+  return (
+    <div className="rounded-lg border border-surface-3 border-l-2 border-l-surface-3 bg-surface-2 p-3.5 animate-pulse">
+      <div className="h-4 w-24 rounded-full bg-surface-3 mb-3" />
+      <div className="space-y-2">
+        <div className={`h-3 rounded bg-surface-3 ${wide ? 'w-full' : 'w-4/5'}`} />
+        <div className="h-3 w-3/5 rounded bg-surface-3" />
+      </div>
     </div>
   );
 }

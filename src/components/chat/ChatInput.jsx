@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 function SendIcon() {
   return (
@@ -11,12 +11,21 @@ function SendIcon() {
 
 export default function ChatInput({ onSend, disabled }) {
   const [value, setValue] = useState('');
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+  }, [value]);
 
   const submit = () => {
     const text = value.trim();
     if (!text || disabled) return;
     onSend(text);
     setValue('');
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
   };
 
   const handleKeyDown = (e) => {
@@ -29,14 +38,14 @@ export default function ChatInput({ onSend, disabled }) {
   return (
     <div className="flex items-end gap-2 px-3 py-3 border-t border-surface-3 shrink-0">
       <textarea
+        ref={textareaRef}
         rows={1}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Ask anything…"
         disabled={disabled}
-        className="flex-1 bg-surface-2 border border-surface-3 rounded-xl px-3.5 py-2.5 text-sm text-gray-200 placeholder-gray-600 resize-none focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-40 leading-relaxed"
-        style={{ maxHeight: '120px', overflowY: 'auto' }}
+        className="flex-1 bg-surface-2 border border-surface-3 rounded-xl px-3.5 py-2.5 text-sm text-gray-200 placeholder-gray-600 resize-none focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-40 leading-relaxed overflow-hidden"
       />
       <button
         onClick={submit}

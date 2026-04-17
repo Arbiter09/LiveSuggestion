@@ -109,6 +109,20 @@ const useSessionStore = create((set, get) => ({
 
   setIsStreaming: (val) => set({ isStreaming: val }),
 
+  // ── Session management ─────────────────────────────────────────────────────
+  clearSession: () =>
+    set({
+      transcriptChunks: [],
+      isRecording: false,
+      transcriptionError: null,
+      suggestionBatches: [],
+      isLoadingSuggestions: false,
+      suggestionError: null,
+      lastSuggestedTranscript: '',
+      chatMessages: [],
+      isStreaming: false,
+    }),
+
   // ── Derived helpers ────────────────────────────────────────────────────────
   getFullTranscript: () => {
     return get()

@@ -5,21 +5,48 @@ import SettingsModal from '../settings/SettingsModal';
 
 export default function Header() {
   const [showSettings, setShowSettings] = useState(false);
-  const { transcriptChunks, suggestionBatches, chatMessages } = useSessionStore();
+  const [confirmClear, setConfirmClear] = useState(false);
+  const { transcriptChunks, suggestionBatches, chatMessages, clearSession, isRecording } = useSessionStore();
 
   const handleExport = () => {
     exportSession({ transcriptChunks, suggestionBatches, chatMessages });
   };
 
+  const handleNewSession = () => {
+    if (confirmClear) {
+      clearSession();
+      setConfirmClear(false);
+    } else {
+      setConfirmClear(true);
+    }
+  };
+
+  const hasContent = transcriptChunks.length > 0 || suggestionBatches.length > 0 || chatMessages.length > 0;
+
   return (
     <>
-      <header className="flex items-center justify-between px-5 py-3 border-b border-surface-3 bg-surface-1 shrink-0 shadow-sm">
+      <header className="flex items-center justify-between px-5 border-b border-surface-3 bg-surface-1 shrink-0 shadow-sm h-12">
         <div className="flex items-center gap-2.5">
           <WaveformIcon />
           <h1 className="text-base font-bold tracking-tight text-gray-100">Live Suggestions</h1>
         </div>
 
         <div className="flex items-center gap-1.5">
+          {hasContent && !isRecording && (
+            <button
+              onClick={handleNewSession}
+              onBlur={() => setConfirmClear(false)}
+              title="Start a new session"
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                confirmClear
+                  ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
+                  : 'bg-surface-2 hover:bg-surface-3 text-gray-300 hover:text-white'
+              }`}
+            >
+              <NewSessionIcon />
+              {confirmClear ? 'Confirm clear?' : 'New Session'}
+            </button>
+          )}
           <button
             onClick={handleExport}
             title="Export session"
@@ -42,6 +69,15 @@ export default function Header() {
 
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
     </>
+  );
+}
+
+function NewSessionIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+      <path d="M3 3v5h5" />
+    </svg>
   );
 }
 

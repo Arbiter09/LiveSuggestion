@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useSessionStore from '../../store/useSessionStore';
 import SettingsField from './SettingsField';
 
@@ -8,6 +8,14 @@ export default function SettingsModal({ onClose }) {
   const { apiKey, setApiKey, settings, updateSettings, resetSettings } = useSessionStore();
   const [activeTab, setActiveTab] = useState('API Key');
   const [localKey, setLocalKey] = useState(apiKey);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   const handleSaveKey = () => {
     setApiKey(localKey.trim());
@@ -24,10 +32,10 @@ export default function SettingsModal({ onClose }) {
           <h2 className="text-sm font-semibold text-gray-100">Settings</h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-200 text-lg leading-none transition-colors"
+            className="text-gray-500 hover:text-gray-200 transition-colors p-0.5 rounded"
             aria-label="Close settings"
           >
-            ✕
+            <CloseIcon />
           </button>
         </div>
 
@@ -66,7 +74,10 @@ export default function SettingsModal({ onClose }) {
                 Save Key
               </button>
               {apiKey && (
-                <p className="text-xs text-green-400">✓ API key is set</p>
+                <p className="flex items-center gap-1.5 text-xs text-green-400">
+                  <CheckIcon />
+                  API key is set
+                </p>
               )}
             </>
           )}
@@ -154,5 +165,22 @@ export default function SettingsModal({ onClose }) {
         </div>
       </div>
     </div>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
   );
 }
