@@ -6,6 +6,18 @@ A web app that listens to live audio from the user's mic and continuously surfac
 
 ---
 
+## How This Improves on TwinMind
+
+TwinMind's live suggestions are passive and generic — they surface as a single undifferentiated feed without distinguishing whether the suggestion is an answer to a question just asked, a fact to verify, or a follow-up to probe. After using the product, three specific gaps stood out:
+
+**1. No suggestion typing.** TwinMind surfaces suggestions without labeling what kind of help they offer. A user can't tell at a glance whether to use a card to respond, to ask, or to push back. Our implementation introduces 5 explicit types — `ANSWER`, `QUESTION_TO_ASK`, `TALKING_POINT`, `FACT_CHECK`, `CLARIFICATION` — so the user immediately knows the intent of each card before clicking.
+
+**2. No meeting-type awareness.** TwinMind treats all conversations the same. A sales call and a system design interview need fundamentally different suggestions. We detect 7 meeting types and apply a different default suggestion mix for each, then override based on what just happened (question asked → at least one ANSWER; factual claim made → consider FACT_CHECK).
+
+**3. Clicking a suggestion opens a generic chat response.** TwinMind's detail view is a standard chat reply. Our click handler passes the suggestion type into the system prompt so each card type gets a structurally different response — FACT_CHECK clicks lead with the correction, QUESTION_TO_ASK clicks give exact phrasing and what a strong answer looks like, TALKING_POINT clicks give the exact intro sentence to use in the conversation.
+
+---
+
 ## Setup
 
 ```bash
