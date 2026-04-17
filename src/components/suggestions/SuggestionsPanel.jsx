@@ -41,7 +41,7 @@ export default function SuggestionsPanel({ onSuggestionClick }) {
 
 function PanelHeader({ batchCount, onRefresh, isLoading, hasTranscript }) {
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-b border-surface-3 shrink-0">
+    <div className="flex items-center justify-between px-4 h-12 border-b border-surface-3 shrink-0">
       <div className="flex items-center gap-2">
         <SparkleIcon />
         <span className="text-sm font-semibold text-gray-200">Suggestions</span>

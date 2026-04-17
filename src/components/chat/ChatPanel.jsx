@@ -63,7 +63,7 @@ export default function ChatPanel() {
 
 function PanelHeader() {
   return (
-    <div className="flex items-center gap-2 px-4 py-3 border-b border-surface-3 shrink-0">
+    <div className="flex items-center gap-2 px-4 h-12 border-b border-surface-3 shrink-0">
       <ChatIcon />
       <span className="text-sm font-semibold text-gray-200">Chat</span>
       <span className="text-xs text-gray-600 bg-surface-2 px-1.5 py-0.5 rounded-full">Session-only</span>
