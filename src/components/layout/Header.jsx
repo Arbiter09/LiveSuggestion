@@ -16,7 +16,7 @@ export default function Header() {
       <header className="flex items-center justify-between px-4 py-3 border-b border-surface-3 bg-surface shrink-0">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-accent" />
-          <h1 className="text-sm font-semibold tracking-wide text-gray-100">TwinMind Live</h1>
+          <h1 className="text-sm font-semibold tracking-wide text-gray-100">Live Suggestions</h1>
         </div>
 
         <div className="flex items-center gap-2">
