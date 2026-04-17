@@ -13,7 +13,7 @@ export default function MicButton() {
       onClick={toggle}
       disabled={disabled}
       title={disabled ? 'Add your Groq API key in Settings first' : undefined}
-      className={`relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed ${
+      className={`relative flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed ${
         isRecording
           ? 'bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/30'
           : 'bg-accent hover:bg-accent-hover shadow-lg shadow-accent/20'
@@ -31,8 +31,8 @@ export default function MicButton() {
 function MicIcon({ active }) {
   return (
     <svg
-      width="20"
-      height="20"
+      width="14"
+      height="14"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
