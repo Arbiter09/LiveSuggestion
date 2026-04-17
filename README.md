@@ -8,13 +8,13 @@ A web app that listens to live audio from the user's mic and continuously surfac
 
 ## How This Improves on TwinMind
 
-TwinMind's live suggestions are passive and generic — they surface as a single undifferentiated feed without distinguishing whether the suggestion is an answer to a question just asked, a fact to verify, or a follow-up to probe. After using the product, three specific gaps stood out:
+After using TwinMind's live suggestions, three gaps stood out that shaped the decisions here.
 
-**1. No suggestion typing.** TwinMind surfaces suggestions without labeling what kind of help they offer. A user can't tell at a glance whether to use a card to respond, to ask, or to push back. Our implementation introduces 5 explicit types — `ANSWER`, `QUESTION_TO_ASK`, `TALKING_POINT`, `FACT_CHECK`, `CLARIFICATION` — so the user immediately knows the intent of each card before clicking.
+**Suggestions have no type label.** TwinMind surfaces cards without telling you what kind of help they are. You can't tell at a glance if a card is answering a question, flagging a bad claim, or suggesting something to say next. This build introduces 5 explicit types (`ANSWER`, `QUESTION_TO_ASK`, `TALKING_POINT`, `FACT_CHECK`, `CLARIFICATION`) so you know the intent of each card before you click it.
 
-**2. No meeting-type awareness.** TwinMind treats all conversations the same. A sales call and a system design interview need fundamentally different suggestions. We detect 7 meeting types and apply a different default suggestion mix for each, then override based on what just happened (question asked → at least one ANSWER; factual claim made → consider FACT_CHECK).
+**Every conversation is treated the same.** A sales call and a system design interview need completely different suggestions. This build detects 7 conversation types and picks a different default suggestion mix for each one. It also adjusts on the fly based on what just happened: if a question was just asked, at least one card will be an ANSWER; if a number or claim was stated, a FACT_CHECK is considered.
 
-**3. Clicking a suggestion opens a generic chat response.** TwinMind's detail view is a standard chat reply. Our click handler passes the suggestion type into the system prompt so each card type gets a structurally different response — FACT_CHECK clicks lead with the correction, QUESTION_TO_ASK clicks give exact phrasing and what a strong answer looks like, TALKING_POINT clicks give the exact intro sentence to use in the conversation.
+**Clicking a card gives a generic reply.** In TwinMind, tapping a suggestion opens a standard chat response. Here, the suggestion type is passed directly into the system prompt so the response format changes depending on what you clicked. A FACT_CHECK click leads with what was said vs. what is accurate. A QUESTION_TO_ASK click gives you the exact phrasing to use and what a strong answer looks like. A TALKING_POINT click gives you the sentence to drop into the conversation naturally.
 
 ---
 
